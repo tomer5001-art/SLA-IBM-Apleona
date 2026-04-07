@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLA IBM – Apleona Israel</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; direction: rtl; }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-title { text-align: center; flex: 1; }
+  .header-title h1 { color: #fff; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; }
+  .header-title p { color: #94a3b8; font-size: 0.8rem; margin-top: 2px; }
+  .logo-box { width: 140px; display: flex; align-items: center; justify-content: center; }
+  .logo-box.right { justify-content: flex-end; }
+  .logo-box.left  { justify-content: flex-start; }
+
+  /* ─── MAIN ─── */
+  .main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+  /* ─── SITE SELECTOR ─── */
+  .site-card {
+    background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .site-card label { font-size: 1rem; font-weight: 600; color: #374151; display: block; margin-bottom: 10px; }
+  .site-select {
+    width: 100%; padding: 12px 16px; font-size: 1rem; border: 2px solid #e5e7eb;
+    border-radius: 10px; background: #f9fafb; color: #1a1a2e; appearance: none;
+    cursor: pointer; direction: rtl;
+  }
+  .site-select:focus { outline: none; border-color: #3b82f6; }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .stat-chip {
+    flex: 1; min-width: 140px; border-radius: 10px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px; font-weight: 600;
+  }
+  .stat-chip.green { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; }
+  .stat-chip.red   { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; }
+  .stat-chip.blue  { background: #eff6ff; border: 1.5px solid #93c5fd; color: #1e40af; }
+  .stat-num { font-size: 1.6rem; font-weight: 800; }
+
+  /* ─── SEARCH ─── */
+  .search-wrap { position: relative; margin-bottom: 20px; }
+  .search-input {
+    width: 100%; padding: 12px 44px 12px 16px; font-size: 1rem;
+    border: 2px solid #e5e7eb; border-radius: 10px; background: #fff;
+    direction: rtl; transition: border-color 0.2s;
+  }
+  .search-input:focus { outline: none; border-color: #3b82f6; }
+  .search-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1.1rem; }
+
+  /* ─── SLA LIST ─── */
+  .sla-list { display: flex; flex-direction: column; gap: 10px; }
+  .sla-card {
+    background: #fff; border-radius: 12px; border-right: 5px solid #e5e7eb;
+    padding: 16px 18px; cursor: pointer; transition: all 0.18s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .sla-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .sla-card.included  { border-right-color: #22c55e; }
+  .sla-card.excluded  { border-right-color: #ef4444; }
+  .sla-card-body { flex: 1; }
+  .sla-code { font-size: 0.75rem; font-weight: 700; color: #6b7280; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .sla-name { font-size: 1rem; font-weight: 600; color: #1a1a2e; }
+  .sla-name-en { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
+  .excluded-msg { font-size: 0.78rem; font-weight: 700; color: #dc2626; margin-top: 6px; }
+  .sla-price-tag { font-size: 0.75rem; color: #6b7280; margin-top: 4px; font-weight: 500; }
+  .badge {
+    flex-shrink: 0; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem;
+    font-weight: 700; white-space: nowrap;
+  }
+  .badge.included { background: #dcfce7; color: #166534; }
+  .badge.excluded  { background: #fee2e2; color: #991b1b; }
+  .more-icon { flex-shrink: 0; color: #9ca3af; font-size: 1.1rem; margin-right: 4px; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    z-index: 200; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #fff; border-radius: 18px; max-width: 640px; width: 100%;
+    max-height: 85vh; overflow-y: auto; padding: 28px 28px 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .modal-code { font-size: 0.8rem; font-weight: 700; color: #6b7280; }
+  .modal-title { font-size: 1.25rem; font-weight: 800; color: #1a1a2e; margin-top: 4px; }
+  .modal-title-en { font-size: 0.85rem; color: #9ca3af; margin-top: 2px; }
+  .modal-close {
+    background: #f3f4f6; border: none; border-radius: 50%; width: 34px; height: 34px;
+    cursor: pointer; font-size: 1.1rem; color: #6b7280; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-right: 12px;
+  }
+  .modal-close:hover { background: #e5e7eb; }
+  .modal-status-bar {
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem;
+  }
+  .modal-status-bar.included { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+  .modal-status-bar.excluded  { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+  .modal-section-title { font-size: 0.85rem; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .modal-desc { font-size: 0.95rem; line-height: 1.7; color: #374151; white-space: pre-wrap; }
+  .modal-divider { border: none; border-top: 1px solid #f3f4f6; margin: 16px 0; }
+
+  /* ─── Q&A SECTION ─── */
+  .qa-section {
+    background: #fff; border-radius: 14px; padding: 24px; margin-top: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .qa-title { font-size: 1.1rem; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; }
+  .qa-subtitle { font-size: 0.85rem; color: #6b7280; margin-bottom: 16px; }
+  .qa-input-row { display: flex; gap: 10px; }
+  .qa-input {
+    flex: 1; padding: 12px 16px; font-size: 0.95rem; border: 2px solid #e5e7eb;
+    border-radius: 10px; direction: rtl; font-family: inherit;
+  }
+  .qa-input:focus { outline: none; border-color: #3b82f6; }
+  .qa-btn {
+    padding: 12px 20px; background: #1a1a2e; color: #fff; border: none;
+    border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    white-space: nowrap; font-family: inherit;
+  }
+  .qa-btn:hover { background: #2d2d50; }
+  .qa-result {
+    margin-top: 16px; padding: 16px; border-radius: 10px; font-size: 0.9rem;
+    line-height: 1.7; display: none;
+  }
+  .qa-result.found { background: #f0fdf4; border: 1px solid #86efac; color: #1a2e1a; }
+  .qa-result.notfound { background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; }
+
+  /* ─── ADMIN ─── */
+  .admin-btn {
+    position: fixed; bottom: 16px; left: 16px; background: rgba(100,100,120,0.15);
+    border: 1px solid rgba(100,100,120,0.25); color: #9ca3af; padding: 6px 12px;
+    border-radius: 8px; font-size: 0.72rem; cursor: pointer; z-index: 150;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .admin-btn:hover { background: rgba(100,100,120,0.25); }
+  .admin-btn.active { background: #1a1a2e; color: #fbbf24; border-color: #fbbf24; font-weight: 700; }
+  .admin-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    z-index: 300; align-items: center; justify-content: center;
+  }
+  .admin-modal-overlay.active { display: flex; }
+  .admin-modal {
+    background: #fff; border-radius: 14px; padding: 28px; width: 320px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center;
+  }
+  .admin-modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: #1a1a2e; }
+  .admin-modal input {
+    width: 100%; padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 8px;
+    font-size: 1.1rem; text-align: center; letter-spacing: 6px; direction: ltr;
+    margin-bottom: 12px; font-family: inherit;
+  }
+  .admin-modal input:focus { outline: none; border-color: #3b82f6; }
+  .admin-modal .err { color: #dc2626; font-size: 0.85rem; margin-bottom: 10px; }
+  .admin-confirm-btn {
+    width: 100%; padding: 10px; background: #1a1a2e; color: #fff; border: none;
+    border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .admin-confirm-btn:hover { background: #2d2d50; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state { text-align: center; padding: 48px 24px; color: #9ca3af; }
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 1rem; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .header { padding: 12px 14px; }
+    .header-title h1 { font-size: 1.1rem; }
+    .logo-box { width: 100px; }
+    .main { padding: 14px 10px; }
+    .modal { padding: 20px 16px 18px; border-radius: 14px; }
+    .stats-bar { gap: 8px; }
+    .stat-chip { padding: 10px 12px; }
+    .stat-num { font-size: 1.3rem; }
+    .qa-input-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <!-- Logo Right: Apleona-Michlol -->
+  <div class="logo-box right">
+    <svg width="120" height="44" viewBox="0 0 120 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="44" rx="6" fill="#1a1a2e"/>
+      <polygon points="8,36 18,10 28,36" fill="#cc2200" opacity="0.9"/>
+      <polygon points="16,36 26,10 36,36" fill="#cc2200" opacity="0.55"/>
+      <text x="42" y="20" font-family="Arial,sans-serif" font-size="9" font-weight="800" fill="#ffffff" letter-spacing="0.5">APLEONA</text>
+      <text x="42" y="32" font-family="Arial,sans-serif" font-size="8" font-weight="600" fill="#cc2200" letter-spacing="1">מכלול</text>
+      <line x1="38" y1="8" x2="38" y2="38" stroke="#cc2200" stroke-width="1" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <div class="header-title">
+    <h1>בדיקת SLA – חוזה IBM</h1>
+    <p>Apleona Israel – Global Real Estate FM</p>
+  </div>
+
+  <!-- Logo Left: SLA Info -->
+  <div class="logo-box left">
+    <svg width="120" height="44" viewBox="0 0 120 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="44" rx="6" fill="#1a1a2e"/>
+      <circle cx="22" cy="22" r="16" fill="none" stroke="#cc2200" stroke-width="2.5"/>
+      <text x="16" y="27" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#cc2200">i</text>
+      <line x1="44" y1="8" x2="44" y2="38" stroke="#cc2200" stroke-width="1" opacity="0.4"/>
+      <text x="52" y="21" font-family="Arial,sans-serif" font-size="11" font-weight="800" fill="#cc2200">SLA</text>
+      <text x="52" y="34" font-family="Arial,sans-serif" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="1">INFO</text>
+    </svg>
+  </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+  <!-- Site Selector -->
+  <div class="site-card">
+    <label>בחר אתר:</label>
+    <select class="site-select" id="siteSelect" onchange="renderSite()">
+      <option value="">— בחר אתר —</option>
+      <option value="COE Cyber Security Be'er Sheva">COE Cyber Security Be'er Sheva</option>
+      <option value="Haifa Lab">Haifa Lab</option>
+      <option value="Israel HQ - Think Hub">Israel HQ – Think Hub</option>
+      <option value="SHAHAR TOWER">SHAHAR TOWER</option>
+    </select>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-chip green"><span class="stat-num" id="statIncluded">0</span><span>כלולים בחוזה</span></div>
+    <div class="stat-chip red"><span class="stat-num" id="statExcluded">0</span><span>לא כלולים</span></div>
+    <div class="stat-chip blue"><span class="stat-num" id="statTotal">0</span><span>סה"כ SLA</span></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap" id="searchWrap" style="display:none">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" id="searchInput" placeholder="חפש SLA לפי שם, קוד או מילת מפתח..." oninput="renderSite()">
+  </div>
+
+  <!-- SLA List -->
+  <div class="sla-list" id="slaList"></div>
+
+</main>
+
+<!-- ─── Q&A SECTION ─── -->
+<section class="main" style="padding-top:0">
+  <div class="qa-section">
+    <div class="qa-title">❓ שאלות כלליות על החוזה</div>
+    <div class="qa-subtitle">כתוב שאלה חופשית והאפליקציה תחפש את התשובה בחוזה IBM</div>
+    <div class="qa-input-row">
+      <input class="qa-input" type="text" id="qaInput" placeholder="לדוגמה: מה זמן התגובה לתקלה? מה כולל שירות הניקיון?" onkeydown="if(event.key==='Enter') answerQuestion()">
+      <button class="qa-btn" onclick="answerQuestion()">חפש בחוזה</button>
+    </div>
+    <div class="qa-result" id="qaResult"></div>
+  </div>
+  <div style="height:60px"></div>
+</section>
+
+<!-- ─── DETAIL MODAL ─── -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-code" id="modalCode"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-title-en" id="modalTitleEn"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-status-bar" id="modalStatusBar"></div>
+    <div class="modal-section-title">תיאור השירות</div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <hr class="modal-divider" id="modalPriceDivider" style="display:none">
+    <div id="modalPriceSection" style="display:none">
+      <div class="modal-section-title">מחיר שנתי (מצב מנהל)</div>
+      <div id="modalPriceValue" style="font-size:1.1rem;font-weight:700;color:#1a1a2e;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ADMIN MODAL ─── -->
+<div class="admin-modal-overlay" id="adminModal">
+  <div class="admin-modal">
+    <h3>🔐 כניסת מנהל</h3>
+    <input type="password" id="adminCodeInput" placeholder="קוד גישה" maxlength="10" onkeydown="if(event.key==='Enter') submitAdminCode()">
+    <div class="err" id="adminErr"></div>
+    <button class="admin-confirm-btn" onclick="submitAdminCode()">אישור</button>
+    <br><br>
+    <button onclick="closeAdminModal()" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:0.85rem;font-family:inherit;">ביטול</button>
+  </div>
+</div>
+
+<!-- ─── ADMIN BUTTON ─── -->
+<button class="admin-btn" id="adminToggleBtn" onclick="onAdminBtnClick()">מנהל</button>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+
+const SITES_DATA = {
+  "COE Cyber Security Be'er Sheva": [
+    {code:"SLA004A", included:true,  price:36351.73},
+    {code:"SLA007A", included:true,  price:7334.80},
+    {code:"SLA008A", included:true,  price:191.88},
+    {code:"SLA008C", included:true,  price:196.34},
+    {code:"SLA008D", included:true,  price:26.77},
+    {code:"SLA012D", included:false, price:0},
+    {code:"SLA013A", included:false, price:0},
+    {code:"SLA017A", included:false, price:0},
+    {code:"SLA017C", included:false, price:0},
+    {code:"SLA017F", included:false, price:0},
+    {code:"SLA018A", included:true,  price:5802.58},
+    {code:"SLA018B", included:true,  price:557.57},
+    {code:"SLA018C", included:true,  price:1115.15},
+    {code:"SLA020A", included:false, price:0},
+    {code:"SLA020C", included:false, price:0},
+    {code:"SLA020D", included:false, price:0},
+    {code:"SLA021A", included:false, price:0},
+    {code:"SLA022A", included:true,  price:517.99}
+  ],
+  "Haifa Lab": [
+    {code:"SLA001A", included:true,  price:21418.53},
+    {code:"SLA003A", included:true,  price:86340.53},
+    {code:"SLA003B", included:false, price:0},
+    {code:"SLA004A", included:true,  price:26556.17},
+    {code:"SLA004B", included:true,  price:48005.34},
+    {code:"SLA004E", included:true,  price:49173.65},
+    {code:"SLA004F", included:true,  price:6408.01},
+    {code:"SLA004H", included:true,  price:6116.19},
+    {code:"SLA005E", included:true,  price:6013.84},
+    {code:"SLA005G", included:true,  price:5129.12},
+    {code:"SLA006A", included:true,  price:22069.37},
+    {code:"SLA006B", included:true,  price:6540.06},
+    {code:"SLA006D", included:true,  price:5232.70},
+    {code:"SLA006F", included:true,  price:3452.21},
+    {code:"SLA006G", included:true,  price:4931.42},
+    {code:"SLA007A", included:true,  price:463249.39},
+    {code:"SLA007B", included:true,  price:12667.84},
+    {code:"SLA007C", included:true,  price:168892.92},
+    {code:"SLA008A", included:true,  price:25998.44},
+    {code:"SLA008C", included:true,  price:58092.35},
+    {code:"SLA008D", included:true,  price:1726.22},
+    {code:"SLA009A", included:true,  price:1514739.01},
+    {code:"SLA010A", included:false, price:0},
+    {code:"SLA010C", included:true,  price:3255.90},
+    {code:"SLA012A", included:true,  price:1376.74},
+    {code:"SLA012B", included:false, price:0},
+    {code:"SLA012C", included:true,  price:15882.89},
+    {code:"SLA012D", included:true,  price:2200.54},
+    {code:"SLA013A", included:true,  price:20591.20},
+    {code:"SLA013B", included:true,  price:25026.62},
+    {code:"SLA013C", included:true,  price:3582.74},
+    {code:"SLA014A", included:true,  price:37474.67},
+    {code:"SLA015A", included:true,  price:61863.51},
+    {code:"SLA017A", included:false, price:0},
+    {code:"SLA017E", included:true,  price:4143.29},
+    {code:"SLA017F", included:true,  price:3813.86},
+    {code:"SLA018A", included:true,  price:47022.55},
+    {code:"SLA018B", included:true,  price:4526.60},
+    {code:"SLA018C", included:true,  price:1813.49},
+    {code:"SLA019A", included:true,  price:299540.58},
+    {code:"SLA019D", included:true,  price:48659.07},
+    {code:"SLA019E", included:true,  price:55641.01},
+    {code:"SLA019F", included:true,  price:3967.61},
+    {code:"SLA019I", included:true,  price:2836.08},
+    {code:"SLA020A", included:false, price:0},
+    {code:"SLA020C", included:false, price:0},
+    {code:"SLA020D", included:false, price:0},
+    {code:"SLA021A", included:false, price:0},
+    {code:"SLA022A", included:true,  price:4209.64}
+  ],
+  "Israel HQ - Think Hub": [
+    {code:"SLA001A", included:false, price:0},
+    {code:"SLA003A", included:true,  price:52839.42},
+    {code:"SLA004A", included:true,  price:333526.82},
+    {code:"SLA004B", included:true,  price:95867.20},
+    {code:"SLA004E", included:false, price:0},
+    {code:"SLA004F", included:true,  price:12816.04},
+    {code:"SLA004H", included:true,  price:12232.37},
+    {code:"SLA005E", included:true,  price:12027.68},
+    {code:"SLA005G", included:true,  price:10258.23},
+    {code:"SLA006A", included:true,  price:44138.74},
+    {code:"SLA006B", included:true,  price:13080.11},
+    {code:"SLA006D", included:true,  price:10465.40},
+    {code:"SLA006F", included:true,  price:6904.42},
+    {code:"SLA006G", included:true,  price:9862.84},
+    {code:"SLA007A", included:true,  price:926498.79},
+    {code:"SLA007B", included:true,  price:25335.69},
+    {code:"SLA007C", included:true,  price:337785.83},
+    {code:"SLA008A", included:true,  price:26112.50},
+    {code:"SLA008B", included:true,  price:5201.69},
+    {code:"SLA008C", included:true,  price:97271.67},
+    {code:"SLA009A", included:true,  price:1330346.23},
+    {code:"SLA010A", included:true,  price:1535.59},
+    {code:"SLA010C", included:true,  price:6114.82},
+    {code:"SLA012A", included:false, price:0},
+    {code:"SLA012B", included:false, price:0},
+    {code:"SLA012C", included:true,  price:12473.18},
+    {code:"SLA012D", included:false, price:0},
+    {code:"SLA013A", included:true,  price:22523.90},
+    {code:"SLA013B", included:true,  price:23824.96},
+    {code:"SLA013C", included:true,  price:3743.83},
+    {code:"SLA014A", included:true,  price:25777.18},
+    {code:"SLA015A", included:true,  price:35060.26},
+    {code:"SLA017A", included:false, price:0},
+    {code:"SLA017E", included:true,  price:2912.27},
+    {code:"SLA017F", included:true,  price:2669.58},
+    {code:"SLA018A", included:true,  price:61708.65},
+    {code:"SLA018B", included:true,  price:4857.65},
+    {code:"SLA018C", included:true,  price:1943.06},
+    {code:"SLA019A", included:true,  price:382210.50},
+    {code:"SLA019D", included:true,  price:59832.84},
+    {code:"SLA019E", included:true,  price:68340.54},
+    {code:"SLA019F", included:true,  price:4881.47},
+    {code:"SLA019I", included:true,  price:3486.76},
+    {code:"SLA020A", included:false, price:0},
+    {code:"SLA021A", included:false, price:0},
+    {code:"SLA022A", included:true,  price:3.18}
+  ],
+  "SHAHAR TOWER": [
+    {code:"SLA003A", included:true,  price:9883.56},
+    {code:"SLA003B", included:true,  price:611.00},
+    {code:"SLA003D", included:true,  price:4630.34},
+    {code:"SLA004A", included:true,  price:333526.82},
+    {code:"SLA004B", included:false, price:0},
+    {code:"SLA004D", included:false, price:0},
+    {code:"SLA004E", included:false, price:0},
+    {code:"SLA005A", included:true,  price:138422.28},
+    {code:"SLA006A", included:true,  price:47295.08},
+    {code:"SLA006B", included:false, price:0},
+    {code:"SLA007A", included:true,  price:385902.01},
+    {code:"SLA008A", included:true,  price:7160.93},
+    {code:"SLA008C", included:true,  price:21314.30},
+    {code:"SLA008D", included:true,  price:1263.40},
+    {code:"SLA009A", included:true,  price:1613660.15},
+    {code:"SLA010A", included:true,  price:18393.57},
+    {code:"SLA012A", included:true,  price:14903.49},
+    {code:"SLA012B", included:false, price:0},
+    {code:"SLA012D", included:false, price:0},
+    {code:"SLA013A", included:true,  price:30854.07},
+    {code:"SLA017A", included:false, price:0},
+    {code:"SLA017C", included:false, price:0},
+    {code:"SLA017E", included:false, price:0},
+    {code:"SLA017F", included:true,  price:1826.72},
+    {code:"SLA018A", included:true,  price:29761.89},
+    {code:"SLA018B", included:true,  price:3209.23},
+    {code:"SLA018C", included:true,  price:1797.17},
+    {code:"SLA019A", included:true,  price:80518.28},
+    {code:"SLA019F", included:true,  price:31058.19},
+    {code:"SLA020A", included:false, price:0},
+    {code:"SLA020C", included:false, price:0},
+    {code:"SLA020D", included:false, price:0},
+    {code:"SLA021A", included:false, price:0},
+    {code:"SLA022A", included:true,  price:37765.60}
+  ]
+};
+
+const SLA_INFO = {
+  "SLA001A": {
+    nameHe: "ניהול ותחזוקת מערכות בקרה ו-BMS",
+    nameEn: "Control Systems and BMS Maintenance",
+    descHe: `ספק השירות (Apleona) אחראי על ניטור, תחזוקה ותיקון כל מערכות הבקרה והניהול של הבניין:
+
+• ניטור שוטף של מערכות BMS, מערכות ניטור חשמל, מכשירי IoT וכל מכשיר רשת המחובר לתפעול המתקן
+• אחריות על תחזוקה ותיקון מערכות BMS כולל בקרים, חיישנים, שרתים, ציוד רשת וכבלים
+• ניהול מלאי מלא של כל ציוד הבקרה הממוחשב – כולל כתובות IP, גרסאות קושחה ומיקום
+• תגובה מיידית לאזעקות ותיקון תקלות שזוהו במערכת
+• ביצוע עדכוני תוכנה, תיקוני אבטחה ועדכוני קושחה – לפחות אחת לרבעון
+• גיבוי תצורות ונתונים – יומי לנתונים היסטוריים, לפני ואחרי כל שינוי
+• שמירת כל תיעוד מערכות: סכמות חיווט, מדריכי הפעלה, קוד תכנות
+• עמידה בתקני אבטחת סייבר של IBM (ITSS) לכל מערכות הבקרה המחוברות
+• יעד זמינות מערכת: 99.9% שנתית (לא כולל תחזוקה מתוכננת)
+• כל פעילויות התחזוקה תירשמנה במערכת CMMS של הלקוח`
+  },
+  "SLA003A": {
+    nameHe: "תחזוקת מערכות אוורור",
+    nameEn: "Ventilation System Maintenance",
+    descHe: `ניהול, תחזוקה, ניטור ותיקון מערכות האוורור במתקן:
+
+• התאמת הפעלת המערכות לתנאי מזג האוויר המשתנים ושמירה על תנאי סביבה נדרשים לפי מפרטי IBM
+• הבטחת יעילות אנרגטית מרבית והצעת פתרונות חיסכון באנרגיה
+• תחזוקה מניעתית שוטפת: ניקוי פילטרים, שמירת מכניקה, בדיקות ביצועים
+• תגובה לתלונות משתמשים ותיקון בעיות איכות אוויר
+• עמידה בדרישות החקיקה המקומית, המלצות יצרן הציוד (OEM) ונוהלי IBM
+• דיווח סטטוטורי ורישום כל פעילויות התחזוקה ב-CMMS
+• בדיקות תקופתיות לוידוא תקינות מלאה וצמצום זמן השבתה`
+  },
+  "SLA003B": {
+    nameHe: "תחזוקת מערכות קירור ומיזוג",
+    nameEn: "Refrigeration / Cooling System Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון מערכות הקירור והמיזוג:
+
+• ניטור וניהול מערכות קירור לשמירה על טמפרטורת מים קרים בכל המעגלים – דרך BMS
+• בדיקות תקופתיות ותחזוקה מניעתית לכל רכיבי מערכת הקירור
+• התאמת הפעלה לתנאי מזג אוויר ומענה לתלונות משתמשים
+• עמידה בכל רגולציה חקיקתית, דרישות ביטוח וסטנדרטים של IBM
+• רישום ודיווח מלא ב-CMMS`
+  },
+  "SLA003D": {
+    nameHe: "שירותי טיפול במים ומערכות מים",
+    nameEn: "Water Treatment Services/Systems",
+    descHe: `הפעלה, תחזוקה וניטור מערכות טיפול במים:
+
+• ניהול תהליכי טיפול במים, בדיקות כימיות וניתוח איכות מים (כולל מדידות לגיונלה)
+• מעקב אחר צריכת כימיקלים ושימוש במים ודיווח לגוף המוסמך
+• פיתוח ויישום נהלי תגובה לחירום לכשלי מערכת או דליפות
+• הבטחת ביצועים מיטביים ויעילות אנרגטית
+• עמידה בחקיקת הסביבה, דרישות ביטוח ונוהלי IBM`
+  },
+  "SLA004A": {
+    nameHe: "תחזוקת מערכות תאורה ותאורת חירום",
+    nameEn: "Lighting and Emergency System Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון כלל מערכות התאורה ותאורת החירום:
+
+• הבטחת פעולה רצופה של כל מערכות התאורה בכל שעות העבודה
+• ניקוי גופי תאורה לפי הצורך ותחזוקה מניעתית שוטפת
+• מענה לבקשות משתמשים לכיוונונים ותיקונים
+• בדיקה ורישום מסודר לפי דרישות רגולטוריות
+• הצעת פתרונות תאורה חסכוניים באנרגיה ויישומם
+• כולל: תאורת חירום, שילוט יציאות, מצברי גיבוי לתאורת חירום
+• בדיקת מחולל חירום ותאורה גיבוי בשעות חשכה – לפי תוכנית תחזוקה מאושרת
+• תיעוד כל הבדיקות ב-CMMS של IBM`
+  },
+  "SLA004B": {
+    nameHe: "תחזוקת חשמל מתח נמוך ולוחות חשמל",
+    nameEn: "Building Electrical LV & Switchgear Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון מערכות חשמל מתח נמוך ולוחות חשמל:
+
+• בדיקת הגדרות מפסקים ורלאים; ווידוא שכל המפסקים מסומנים לפי ההגדרות בפועל
+• עדכון ושמירת תיוג קואורדינציה סלקטיבית ו-Arc Flash
+• ניהול כל בדיקות החוקיות הסטטוטוריות, כולל תחזוקה ופעולות נדרשות
+• עדכון ותחזוקת תוכניות חשמל (Single Lines, תוכניות התקנה וכו')
+• עמידה בתקנות חשמל מקומיות, נוהלי IBM ומלצות יצרן
+• כולל: לוחות חשמל ראשיים, לוחות משנה, כבלים, שינאים ואביזרים נלווים
+• תיעוד מלא ב-CMMS`
+  },
+  "SLA004D": {
+    nameHe: "תחזוקת מערכות גנרטור חירום",
+    nameEn: "Emergency Generator System Maintenance",
+    descHe: `תחזוקה ותפעול מערכות גנרטור חירום:
+
+• אופטימיזציה של ייצור חשמל בחירום – מטרה: זמינות מקסימלית (100% או כפי שסוכם)
+• הרצת גנרטורים בעומס חלקי ומלא לפי הוראות יצרן ובתיאום עם IBM
+• תחזוקה מניעתית: בדיקות שוטפות, החלפת שמן, פילטרים ומצברים
+• ניהול מלאי דלק, בדיקת מערכות אחסון ועמידה בתקנות אחסון דלק
+• בדיקות תקופתיות ועמידה בדרישות רגולטוריות
+• תיעוד מלא של כל הבדיקות והתחזוקה ב-CMMS`
+  },
+  "SLA004E": {
+    nameHe: "תחזוקת מערכות UPS/DRUPS ומפסקים סטטיים",
+    nameEn: "UPS / DRUPS System and Static Switch Maintenance",
+    descHe: `תחזוקה ותפעול מערכות אל-פסק (UPS/DRUPS) ומפסקים סטטיים:
+
+• אופטימיזציה של מערכות UPS לזמינות רצופה – כולל צינורות דלק, אחסון וציוד גנרטורים
+• בדיקות תפקוד תחת עומס חלקי ומלא, תיאום עם IBM לוודא זמינות
+• תחזוקה שוטפת: בדיקת מצברים, בדיקות העברה אוטומטית, בדיקות מפסקים סטטיים
+• בדיקות מסודרות לוודא שהמערכת תתפקד בשעת חירום
+• תיעוד כל הבדיקות ב-CMMS`
+  },
+  "SLA004F": {
+    nameHe: "תחזוקת מערכות כריזה ותקשורת",
+    nameEn: "Public Address Communications Systems Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון מערכות כריזה (PA) ותקשורת:
+
+• שמירת מלאי חלקי חילוף חיוניים לתיקונים מהירים ומניעת השבתה
+• הבטחת שילוב מושלם של מערכת הכריזה עם מערכות בטיחות אחרות במתקן
+• תיאום עם ספקי שירות אחרים לתאימות ופעולה מיטבית
+• תחזוקה מניעתית: בדיקת רמקולים, מגברים, בקרים ועמדות שידור
+• תיעוד כל פעילויות התחזוקה ב-CMMS`
+  },
+  "SLA004H": {
+    nameHe: "בדיקת בטיחות מכשירים חשמליים ניידים (PAT)",
+    nameEn: "Portable Appliance Testing",
+    descHe: `בדיקות בטיחות מחייבות לכל המכשירים החשמליים הניידים:
+
+• ביצוע בדיקות ציות שוטפות על כל המכשירים הרלוונטיים, כולל בדיקות GFCI
+• הבדיקות מכסות את כל הדרישות הסטטוטוריות; דוח מוגש לIBM בסוף כל שנת חוזה
+• תיאום עם משתמשי קצה למועד הבדיקות ביעילות וללא הפרעה לעבודה
+• זיהוי מכשירים לא תקינים, סימונם והוצאתם מהשימוש
+• עמידה בדרישות חוקיות ובנהלי IBM לבטיחות חשמלית`
+  },
+  "SLA005A": {
+    nameHe: "מערכות אוויר דחוס",
+    nameEn: "Compressed Air System",
+    descHe: `ניהול, תחזוקה וניטור מערכות אוויר דחוס:
+
+• כולל מערכות אוויר דחוס פנאומטיות לבקרת HVAC ומערכות ואקום
+• תחזוקה מניעתית שוטפת: בדיקות לחץ, ניקוי פילטרים, שמן ורטיבות
+• תיקון תקלות ושמירה על רמות לחץ נכונות בכל הנקודות
+• עמידה בתקנות מקומיות ודרישות ביטוח
+• כל פעילויות התחזוקה תירשמנה ב-CMMS`
+  },
+  "SLA005E": {
+    nameHe: "תחזוקת ניקוזים ואינסטלציה",
+    nameEn: "Drains & Plumbing Fixtures",
+    descHe: `ניהול, תחזוקה ותיקון ניקוזים ואינסטלציה:
+
+• בדיקה ותיקון ברזים, חיישני אינסטלציה, אסלות, ניקוזים וכיורים
+• פתיחת חסימות בניקוזים בשיטות מתאימות (שטיפה, שיפוד, ג'טינג)
+• ניקוי תקופתי של מערכות ניקוז כולל צינורות, מלכודות ומשקעים
+• תיקון דליפות ונזקי מים מיידית
+• עמידה בחקיקת האינסטלציה המקומית ונוהלי IBM`
+  },
+  "SLA005G": {
+    nameHe: "תחזוקת אספקת מים חמים וקרים",
+    nameEn: "Hot & Cold-Water Supply and Distribution",
+    descHe: `ניהול, תחזוקה ותיקון מערכות אספקת מים חמים וקרים:
+
+• עמידה מלאה במדיניות "Drinking Water Preventative Maintenance" של IBM
+• ניהול מלאי מוצרי צריכה לשתייה ומכשירי מים – ברמות מתאימות בכל עת
+• ניטור טמפרטורות, איכות מים ומניעת לגיונלה
+• בדיקות תקופתיות, ניקוי ובדיקות חיידקים לפי חקיקה
+• תחזוקת כל הצנרת, ארונות, שסתומים ומחממי מים
+• תיעוד ב-CMMS`
+  },
+  "SLA006A": {
+    nameHe: "תחזוקת מערכות גילוי ואזעקת אש",
+    nameEn: "Detection and Alarm Systems",
+    descHe: `ניהול, תחזוקה ותיקון מערכות גילוי אש ואזעקה:
+
+• פיתוח ושמירת תוכנית תגובת חירום לכשלי מערכת ואזעקות
+• שמירת מלאי חלקי חילוף קריטיים למינימום זמן השבתה
+• עדכון שוטף של מדריכי הפעלה
+• תחזוקה מניעתית: בדיקות גלאים, בדיקות אזעקה, כיול ותיקון
+• כולל: גלאי עשן, גלאי חום, לוחות שליטה, סיירנות ושילוט
+• עמידה בחקיקת כיבוי אש המקומית ונוהלי IBM
+• כל פעילויות התחזוקה ב-CMMS`
+  },
+  "SLA006B": {
+    nameHe: "תחזוקת מערכות ספרינקלרים",
+    nameEn: "Sprinkler Systems",
+    descHe: `ניהול, תחזוקה ותיקון מערכות ספרינקלרים:
+
+• בדיקות תקופתיות שראשי הספרינקלרים פנויים מחסמים, נקיים ובמצב תקין
+• הבטחת שילוב תקין עם מערכות גילוי אש ואזעקה
+• כולל: מיכלי מים, צנרת, תחנות שאיבה, ברזי כיבוי, מדחסים וראשי ספרינקלר
+• בדיקות זרימה ולחץ תקופתיות
+• עמידה בתקנות אש מקומיות ונוהלי IBM
+• תיעוד ב-CMMS`
+  },
+  "SLA006D": {
+    nameHe: "תחזוקת דלתות אש",
+    nameEn: "Fire Door Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון דלתות אש:
+
+• כולל: מנגנוני סגירה, שילוט עדכני, ידיות וציר
+• בדיקות תקופתיות לוודא שדלתות נסגרות כהלכה ואוטמות
+• תיקון מיידי של כל תקלה שזוהתה
+• עמידה בתקנות אש מקומיות ונוהלי IBM
+• תיעוד ב-CMMS`
+  },
+  "SLA006F": {
+    nameHe: "תחזוקת מטפי אש וסלילי כיבוי",
+    nameEn: "Fire Extinguishers & Hose Reels",
+    descHe: `ניהול, תחזוקה ותיקון מטפי אש וסלילי כיבוי:
+
+• ווידוא שכל המטפים וסלילי הכיבוי מסומנים בבירור בשילוט מתאים
+• בדיקות תקופתיות: לחץ, שלמות, תוקף וזמינות
+• החלפה ומילוי מחדש לאחר שימוש או אחרי בדיקה תקופתית
+• עמידה בחקיקת כיבוי אש ונוהלי IBM
+• תיעוד ב-CMMS`
+  },
+  "SLA006G": {
+    nameHe: "ניהול תכנית הגנה מפני אש",
+    nameEn: "Fire Protection Program Management",
+    descHe: `ניהול כולל של תכנית ההגנה מפני אש במתקן:
+
+• הנפקת היתרי עבודה, היתרי אש, תוכניות מניעה ותוכניות בטיחות לכל פעילויות התחזוקה
+• חידוש תיעוד/אישורים קיימים להגנה מפני אש (אחריות IBM)
+• ניהול תוכנית הדרכות לצוות בנושאי אש ופינוי
+• תיאום עם גורמי כיבוי אש וביצוע תרגילי חירום
+• שמירת רישומים מלאים ב-CMMS`
+  },
+  "SLA007A": {
+    nameHe: "תחזוקה שוטפת ותיקוני פנים",
+    nameEn: "Interior - Repair and Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון שוטף של כל מבנה וסביבת הפנים:
+
+• הבטחת מבנה הבניין במצב בטוח, יציב ומתאים לשימוש המיועד
+• בדיקות שוטפות לזיהוי בעיות פוטנציאליות לפני שהופכות לחמורות
+• טייח וצביעה: קירות, דלתות ומשטחים צבועים – תוצאה מקצועית ואחידה
+• החלפת מחיצות, מוטות תמיכה, ריצוף, תקרות ואריחים שבורים
+• תיקון כל נזק שדווח ע"י משתמשים דרך מערכת CMMS
+• ניהול קבלנים חיצוניים לשירותי תחזוקה מיוחדים
+• תגובה לפניות דחופות תוך זמן קצוב – לפי SLA IBM
+• שמירת תעוד מלא ב-CMMS`
+  },
+  "SLA007B": {
+    nameHe: "הדברה פנים וחוץ",
+    nameEn: "Interior & Exterior Pest Control",
+    descHe: `פיתוח ויישום תוכנית הדברה מקיפה להבטחת אתר נקי מנגעים:
+
+• טיפול בפלישות ומפגעי מזיקים בכל עת שיזוהו
+• יישום אמצעי הדברה בטוחים וחסכוניים עפ"י מדיניות IBM
+• הבטחה שאמצעי ההדברה לא יוות סיכון לדיירי הבניין
+• כיסוי מלא של מטבחי קפיטריה, ספקי קפיטריה ושטחי פנים/חוץ
+• שימוש בחומרים מאושרים בלבד (לפי רשימת IBM)
+• תיעוד כל ביקורי ההדברה ב-CMMS`
+  },
+  "SLA007C": {
+    nameHe: "ניהול צמחי פנים",
+    nameEn: "Interior - Plants, Shrubs and Trees",
+    descHe: `אספקה, תחזוקה וניהול כל הצמחים, השיחים, העצים וקירות הירוק:
+
+• כולל צמחים חיים, מוס וצמחים מלאכותיים איכותיים
+• השקיה שוטפת, גיזום, דישון, הדברה, ניקוי מכלים ואבק מצמחים מלאכותיים
+• החלפת צמחים מתים או גוועים לפי הצורך
+• תיאום עם עיצוב הפנים לשמירת אסתטיקה נאותה
+• תיעוד ב-CMMS`
+  },
+  "SLA008A": {
+    nameHe: "תחזוקת ציוד קפיטריה",
+    nameEn: "General Cafeteria Equipment Maintenance",
+    descHe: `ניהול, תחזוקה ותיקון ציוד הקפיטריה:
+
+• תיאום עם ספק המזון ומשקאות להבטיח שכל העבודות מתוזמנות כך שלא יפריעו לזמני ההגשה
+• שמירת חלקי חילוף בסיסיים באתר לתיקונים דחופים
+• כולל: מקררים, מקפיאים, גנרטורי גז, כיריים, וכל ציוד קפיטריה
+• תחזוקה מניעתית ותיקון מהיר של כשלים
+• תיעוד ב-CMMS`
+  },
+  "SLA008B": {
+    nameHe: "תיקון ציוד כללי בבניין",
+    nameEn: "General Building Equipment Repair",
+    descHe: `ניהול, תחזוקה ותיקון ציוד מכני כללי שאינו נכלל בSLA אחר:
+
+• כולל: מערכות הובלת דואר, מכבשים, ציוד מונע, מלגזות ורכבים מונעים אחרים
+• מערכות גישה לחזית מבנה, שרשראות, אלונקות ומנופים
+• תחזוקה מניעתית ותיקון על פי דרישת IBM
+• תיעוד ב-CMMS`
+  },
+  "SLA008C": {
+    nameHe: "תחזוקת ציוד אבטחה",
+    nameEn: "Security Equipment",
+    descHe: `ניהול, תחזוקה ותיקון כל ציוד האבטחה:
+
+• מענה לבקשות צוות האבטחה של IBM כולל חקירת אזעקות ואיפוסים
+• כולל: בקרי CAS, קוראי תגים, מצלמות CCTV פנימיות וחיצוניות
+• מערכות גילוי פורצים, גלאי תנועה פנימיים, חיישני היקף
+• אזעקות פאניקה, בולרדים, מערכות זיגוג חכם ומנגנוני שערים
+• תחזוקה מניעתית ותגובה לתקלות 24/7
+• תיעוד ב-CMMS בהתאם לנהלי SECMAN של IBM`
+  },
+  "SLA008D": {
+    nameHe: "ניהול מפתחות",
+    nameEn: "Keys",
+    descHe: `ניהול מקיף של מפתחות ומנעולים בכל המתקן:
+
+• אספקת מפתחות חלופיים לריהוט, לוקרים ותיבות דואר – ממלאי שוטף
+• בקשת IBM להחלפת מנעולים באתר (חדרי ישיבות, מנעולי היקף, שירותי בניין) – בתיאום עם מנענל
+• ניהול רישום מלא של כל המפתחות, הנפקות וגריעות
+• תגובה מהירה לאובדן מפתח או נעילה בחוץ
+• תיעוד ב-CMMS`
+  },
+  "SLA009A": {
+    nameHe: "שירותי ניקיון סטנדרטי",
+    nameEn: "Standard Housekeeping Frequencies",
+    descHe: `שירות ניקיון מקיף על פי לוחות תדירויות מוגדרים:
+
+• ביצוע שירותים בהתאם לטבלת תדירויות הניקיון שהוסכמה
+• התדירות המינימלית נקבעה בטבלה; הספק יתאים תדירות נוספת לפי הצורך לעמידה בסטנדרטים
+• מענה ניקיון מתקן לפי קריאות שירות ממשתמשים
+• ניקיון תיקוני מיידי לאירועי זיהום בלתי צפויים
+• ניקיון כולל: משרדים, מסדרונות, חדרי שירותים, מטבחים, חדרי כנסים ושטחים משותפים
+• שימוש בחומרי ניקיון מאושרים לפי רשימת IBM
+• תיעוד ב-CMMS`
+  },
+  "SLA010A": {
+    nameHe: "פינוי ומיחזור פסולת",
+    nameEn: "Waste Removal & Recycling Services",
+    descHe: `ניהול מקיף של פסולת לא מסוכנת:
+
+• איסוף, מיון, ניהול ופינוי כל הפסולת הלא מסוכנת מהאתר
+• עמידה בדרישות הרשות המקומית וסטנדרטי הסביבה של IBM
+• תחזוקת ציוד מיחזור ופינוי (מכבשים, משקלים) וסימון נכון
+• ווידוא שגודל מכלי פסולת ולוח איסופים מותאמים לצורך בפועל
+• מדיניות סקירה תקופתית לאופטימיזציית מיכלים ולוחות זמנים
+• דיווח על כמויות ב-CMMS`
+  },
+  "SLA010C": {
+    nameHe: "ניהול ספק פסולת סודית",
+    nameEn: "Mgmt / Coordination of Confidential Waste Supplier",
+    descHe: `תיאום ופיקוח על שירות הפסולת הסודית של IBM:
+
+• תיאום עם ספק הפסולת הסודית של IBM להבטחת ביצוע חלק
+• הסדרת כרטיסי כניסה ואישורי גישה לספק
+• קביעת לוח זמנים לפינוי לפי קיבולת קופסאות או מגרסות – בשעות עבודה רגילות
+• מעקב ורישום משקל הפסולת הסודית לדיווח ל-IBM
+• סקירה שוטפת של פעולת ספק הצד השלישי לוודא עמידה בנהלי IBM`
+  },
+  "SLA012A": {
+    nameHe: "הנדסת אמינות מערכות",
+    nameEn: "Systems & Reliability Engineering",
+    descHe: `ניהול אמינות מערכות ופתרון תקלות מהשורש:
+
+• הכנת דוח ניתוח סיבת שורש (RCA) ראשוני בתוך 24 שעות מכל השבתת מערכת
+• זיהוי אחריות: שימוש לא מתוכנן של IBM, שגיאות ספק, כשל ציוד, כשל ספק שירות חיצוני
+• בניית תוכניות פעולה לשיפור אמינות ומניעת תקלות חוזרות
+• תיאום עם צוות האנרגיה של IBM וצוות הנדסי
+• כל פעילויות ב-CMMS`
+  },
+  "SLA012B": {
+    nameHe: "שירותי ניהול אנרגיה",
+    nameEn: "Energy Management Services",
+    descHe: `ניהול מקיף של תוכניות אספקה, ביקוש, ניטור ודיווח אנרגיה:
+
+• ניהול אפקטיבי של תוכניות אנרגיה של IBM – ניטור, דיווח ואופטימיזציה
+• נקודות קשר גיאוגרפיות לתיאום עם נציגי IBM בנושאי אנרגיה
+• זיהוי גורמים פנימיים וחיצוניים המשפיעים על צריכת אנרגיה
+• זיהוי, תיאום ויישום פעולות לשיפור ביצועי אנרגיה
+• שילוב תהליכי עסק למערכת ניהול אנרגיה (EnMS)
+• הדגמת מנהיגות ומחויבות ביעדי חיסכון באנרגיה
+• דיווח שוטף ב-CMMS`
+  },
+  "SLA012C": {
+    nameHe: "ניהול תיעוד ורישומי הבניין",
+    nameEn: "Building Records Management",
+    descHe: `ניהול, עדכון ושמירת תיעוד מלא של הבניין:
+
+• שמירת נתונים מעודכנים ומדויקים בכלים הדיגיטליים של IBM (Tririga, Maximo, RESObase)
+• יצירה וניהול מסדי נתונים של מרחב, נכסים וציוד – כולל מכניקה, חשמל ובקרה
+• ניהול רישום מבנה, תיאורי מבנה, תכניות, תעודות הגנה מאש ואישורי בניה
+• עמידה בדרישות טכניות, יצרן ורגולטוריות של IBM`
+  },
+  "SLA012D": {
+    nameHe: "ניהול חשבונות ספקי אנרגיה (חובה)",
+    nameEn: "Utilities Bill Management",
+    descHe: `ניהול מקיף של תהליך חיוב שירותים בשם IBM:
+
+• קריאה ורישום תקופתי של מדי חשמל/מים/גז, כולל מדי משנה לדיירים
+• קבלה ואימות חשבוניות מספקים: בדיקת פרטים, קריאות מד, מחירים, תקופות
+• עיבוד תשלומים ותיאום עם מחלקות הכספים
+• עמידה בדרישות חוקיות לשמירת רישומים
+• דיווח שוטף ל-IBM על צריכה`
+  },
+  "SLA013A": {
+    nameHe: "תכנון וניהול מרחב",
+    nameEn: "Space Planning",
+    descHe: `ניהול מקיף של מידע מרחבי לפי תהליך ניהול המרחב הגלובלי של IBM:
+
+• יצירה, עדכון וביטול פרופילים ותיעוד ב-TRIRIGA
+• שמירת עקביות בין TRIRIGA למציאות הפיזית בשטח
+• ניהול הקצאות שטח, Chargeback ותכניות קומה
+• ביצוע שינויים כתוצאה מעבודות Small Jobs ועבודות עיצוב
+• עמידה בסיווגי OSCRE לכל רישומי מרחב`
+  },
+  "SLA013B": {
+    nameHe: "שירותי ניהול העברות ומעברים",
+    nameEn: "Move Management Services",
+    descHe: `ניהול מעברי עובדים ופריטים עד 15 אנשים בתוך קמפוס אחד:
+
+• תיאום מעברים כולל ממשק עם צוות IT/טלפוניה של IBM
+• סידורי ריהוט קטנים ועיצוב מחדש
+• התקנת ארונות וארגון משרד
+• ניקיון שטח לאחר מעבר
+• הדפסת שלטי שמות
+• העברת ציוד: ציוד IT, ריהוט, חפצים אישיים עם עגלות
+• התקנת לוחות מחיקה, מדפים ותמונות
+• תיאום עם שאר הגורמים המעורבים`
+  },
+  "SLA013C": {
+    nameHe: "ניהול מלאי ריהוט",
+    nameEn: "Furniture Inventory Management",
+    descHe: `יצירה ושמירת רישום מלא של כל הריהוט:
+
+• ניהול מלאי ריהוט בחנויות האחסון של IBM
+• הפצת ריהוט לפי הצורך בתוך הנכס
+• עדכון ודיווח שוטף ל-IBM לפי בקשה`
+  },
+  "SLA014A": {
+    nameHe: "חלוקה, שילוח וקבלת סחורות",
+    nameEn: "Distribution / Shipping and Receiving",
+    descHe: `ניהול מלא של שילוח, קבלה וחלוקה פנימית של סחורות:
+
+• קבלת משלוחים נכנסים, בדיקה, תיעוד ואחסון
+• ביצוע הובלות פנימיות ל/מנקודות ייעוד בתוך הקמפוס
+• תיאום בין ספקי משלוח לאתר
+• טיפול בפריטים כבדים
+• שמירת רישומים מלאים לצורך חיוב
+• עמידה בדרישות אבטחה וחוזה IBM`
+  },
+  "SLA015A": {
+    nameHe: "שירותי דואר – חדר דואר מרכזי",
+    nameEn: "Mail Services and Postage (Centralized Mailroom)",
+    descHe: `הפעלת חדר דואר מרכזי בשעות עבודה רגילות (לא כולל חגים):
+
+• אספקת חומרי אריזה לחבילות קטנות – לעמדות קצה או אריזה מטעם עובד
+• טיפול בבקשות: איסוף פריטים ממשתמשים לשילוח ומסירת דואר נכנס
+• טיפול בדואר שוטף, דואר רשום, דואר אנונימי
+• העברת פריטים כבדים דרך SLA014A
+• שמירת רישומים לחיוב על יחידות עסקיות
+• עמידה בנהלי שמירת סודיות ואבטחת מידע`
+  },
+  "SLA017A": {
+    nameHe: "ניהול סביבה וחומרים כימיים (חובה)",
+    nameEn: "Environmental and Chemical Mgmt Program",
+    descHe: `ניהול תכנית כימיקלים וסביבה מקיפה:
+
+תכנית ניהול כימיקלים:
+• תיעוד כל הכימיקלים עם גיליונות SDS מעודכנים
+• תיוג מכלי כימיקלים עם שם וסמל GHS
+• אחסון נכון עם containment משני מתאים
+• אישור כל כימיקל במערכת ניהול הכימיקלים של IBM לפני שימוש ראשון
+• עמידה ברשימת כימיקלים אסורים ומוגבלים של IBM
+
+תכנית מניעה ותגובה לתקריות סביבתיות:
+• מיפוי אזורי סיכון לשפיכות (מיכלי אחסון, מגדלי קירור, מחולל)
+• ניהול נהלי משלוח כימיקלים ותיעוד כל משלוח
+
+תכנית ניהול פליטות אוויר:
+• בדיקות פליטות אוויר ודיווח לגוף הרלוונטי כנדרש`
+  },
+  "SLA017C": {
+    nameHe: "שירותי סילוק פסולת מסוכנת (חובה)",
+    nameEn: "Hazardous Waste Disposal Services",
+    descHe: `ניהול תהליך סילוק פסולת מסוכנת בשם IBM:
+
+• תיאום לוגיסטיקה מלאה של תהליך סילוק הפסולת המסוכנת
+• חתימה על מסמכי הובלה ע"י כוח אדם מוסמך TDG
+• איסוף והכנת פסולת לפני הגעת המוביל
+• אחסון נכון: שיוג, שמירת containment משני, ציוד כיבוי אש מתאים
+• שימוש בספקים מאושרים ע"י IBM לסילוק
+• רישום נפחים, משקלים ומסמכי שינוע לכל קטגוריית פסולת`
+  },
+  "SLA017E": {
+    nameHe: "תכנית שמירת מים",
+    nameEn: "Water Conservation and Water Discharges Program",
+    descHe: `ניטור, ניהול ושמירת מים:
+
+• מדידה ומעקב של מים פוטבלים ולא פוטבלים בכלי IBM
+• מעקב אחר פריקות מים לביוב ולמקווי מים
+• קביעת אופן השימוש במים לפי מד-משנה
+• יצירה ועדכון מפת צנרת מים, ניקוזים ושקעים כולל ניקוז גשמים
+• עמידה ביעדי מים של IBM ויישום קמפיינים לחיסכון`
+  },
+  "SLA017F": {
+    nameHe: "עדכוני רגולציה ורישומים חוקיים",
+    nameEn: "Regulatory Updates and Legal Registers",
+    descHe: `מעקב אחר רגולציה סביבתית ועדכון IBM:
+
+• בקיאות מלאה בכל תקנות הסביבה הקיימות
+• ניהול תוכנית מתועדת לניטור רגולציה חדשה ובדיקת רלוונטיות
+• שמירת רישום לכל אתר עם כל הרגולציות הרלוונטיות
+• הודעה ל-IBM על כל רגולציה חדשה/שינוי תוך 30 יום מגילוי`
+  },
+  "SLA018A": {
+    nameHe: "ניהול בריאות ובטיחות",
+    nameEn: "Health & Safety Management",
+    descHe: `שירותי בריאות ובטיחות מקיפים:
+
+מוכנות חירום:
+• ניהול לוחות הנחיות חירום בכל קומות/קמפוסים, כולל מסלולי מפלט ונציגי חירום
+• תמיכה בתוכנית תגובת חירום, השתתפות בצוותי מפלט, שומרי אש, ומגישי עזרה ראשונה
+• הבטחת הדרכות לפי חקיקה מקומית
+
+ניהול אסבסט:
+• תוכנית בקרת אסבסט לצמצום סיכונים
+• תיעוד ומעקב, בדיקות תקופתיות לוודא שחומר שלם ולא פגום
+
+תיעוד בטיחות:
+• ציות לתקני Arc-Flash וחשמל מתח גבוה
+• תוכנית היתרי עבודה: עבודה בגובה, עבודות חמות, כניסה לחללים סגורים, LOTO, מתח גבוה`
+  },
+  "SLA018B": {
+    nameHe: "ניהול ארונות עזרה ראשונה",
+    nameEn: "First Aid Cabinet Management",
+    descHe: `ניהול מלא של ציוד עזרה ראשונה:
+
+• ניהול תהליך end-to-end: ציוד מתאים, מעקב רמות, תיעוד מלאי
+• הבטחת ציוד עזרה ראשונה בכל הארונות – לפי חקיקה מקומית
+• ריענון מלאי לפני תאריך תפוגה
+• דיווח ל-IBM לפחות פעם בשנה בפורמט הנדרש`
+  },
+  "SLA018C": {
+    nameHe: "ניהול מכשירי החייאה (AED)",
+    nameEn: "AED Management",
+    descHe: `ניהול מלא של מכשירי הדפיברילטור החיצוניים (AED):
+
+• בדיקות מוכנות AED לפי CMMS: מעקב טעינה ותפקוד
+• ניטור מלאי אביזרי AED לוודא ציות לחקיקה
+• תיעוד מלא לפי דרישות סטטוטוריות
+• דיווח ל-IBM לפחות אחת לשנה`
+  },
+  "SLA019A": {
+    nameHe: "שירותי FM נוספים",
+    nameEn: "Other Facilities Management",
+    descHe: `מתן שירותי ניהול מתקנים נוספים לפי הצורך הספציפי של האתר:
+
+• שירותים נוספים שאינם מכוסים ב-SLA אחר ומוגדרים כ-Variation לחוזה
+• יכולים לכלול: שירותי קבלה, ניהול חניון, ניהול אחסון, שירותי ניהול מיוחדים
+• כל שירות מוגדר כנספח נפרד לחוזה IBM
+• תיאום ותיעוד מלאים בהתאם לדרישות IBM`
+  },
+  "SLA019D": {
+    nameHe: "שירותי חדרי ישיבות",
+    nameEn: "Conference/Meeting Room Services",
+    descHe: `ניהול שוטף של חדרי הישיבות והציוד שבהם:
+
+• הבטחת ציוד תקין בכל עת: מקרנים, מסכי הקרנה, ציוד ועידת וידאו, טלוויזיות, טלפוני כנסים
+• מענה לקריאות תיקון ציוד ומתן פתרונות מקצועיים
+• ניהול תיקונים ותיאום עם ספקים – תיקוני אחריות לא יחויבו
+• ניהול מלאי ציוד AV נייד: הוצאה ואיסוף
+• שמירת מלאי חלקים לתיקונים מהירים (כבלים, נורות, מתאמים)
+• הבטחת זמינות ציוד כתיבה (מרקרים ולוח מחיקה)
+• מחיקת לוחות לבנים מדי יום
+• שינוי סידור חדר לפי בקשה`
+  },
+  "SLA019E": {
+    nameHe: "ממשק עם בעל הנכס/משכיר",
+    nameEn: "Landlord / Tenant Interface",
+    descHe: `ייצוג IBM מול בעל הנכס ותיאום כל נושאי השכירות:
+
+• ייצוג IBM בכל הביקורות של בעל הנכס וביצוע מעקב אחר שירותיו
+• ניהול בעיות חניון ורישיונות חניה כולל שמירת רישומים
+• ניהול תגי כניסה של בעל הנכס כולל שמירת רישומים
+• תיאום ופיקוח על עבודות קטנות/פרויקטים מטעם בעל הנכס ואחריות על תגי גישה
+• ממשק בנושאי חקיקה סביבתית ומשפטית מול בעל הנכס`
+  },
+  "SLA019F": {
+    nameHe: "שירותי ממשק קפיטריה",
+    nameEn: "Food Services / Cafeteria - Interface",
+    descHe: `ניהול הממשק בין IBM לספק המזון והמשקאות:
+
+• ניהול הממשק בין IBM לספק הקפיטריה לכל נושאי FM
+• קיום פגישות עם ספק הקפיטריה לסקירת שירותי FM
+• ניהול בדיקות חוקיות על ציוד בישול (כולל מכונות בישול)
+• אספקה, אחסון ומינון כימיקלים למלכודות שומן
+• עמידה בדרישות סביבה ואנרגיה של IBM (כימיקלים, שמירת מים, הפחתת פלסטיק חד-פעמי)
+• מעקב ודיווח על כמות שמן בישול למחזור`
+  },
+  "SLA019I": {
+    nameHe: "ניהול לוקרים",
+    nameEn: "Locker Management",
+    descHe: `ניהול שוטף של כל הלוקרים באתר:
+
+• הקצאת לוקרים לפי הצורך
+• שמירת רישום מדויק ועדכני
+• מעקב אחר לוקרים פנויים לוודא מידע מדויק בכל עת
+• ניקוי לוקרים לאחר שעובדים עזבו חפצים (לפי הנחיית IBM מה לעשות)
+• טיפול בתקלות מנעולים ומנגנונים`
+  },
+  "SLA020A": {
+    nameHe: "ניהול מרחב – שירות חובה",
+    nameEn: "Space Management (Mandatory)",
+    descHe: `שירות חובה – מוגדר בהסכם SOW תחת סעיף 3 "Account Level Platform Services".
+
+שירות זה הינו שירות פלטפורמה ברמת חשבון (Account Level) המחייב כל אתרי IBM.
+הגדרה מפורטת מופיעה בהסכם SOW של IBM – יש לפנות למנהל החשבון לפרטים נוספים.`
+  },
+  "SLA020C": {
+    nameHe: "תכניות סביבה ואנרגיה – חובה",
+    nameEn: "Environmental and Energy Programs (Mandatory)",
+    descHe: `שירות חובה – מוגדר בהסכם SOW תחת סעיף 3 "Account Level Platform Services".
+
+שירות זה הינו שירות פלטפורמה ברמת חשבון (Account Level) המחייב כל אתרי IBM.
+הגדרה מפורטת מופיעה בהסכם SOW של IBM – יש לפנות למנהל החשבון לפרטים נוספים.`
+  },
+  "SLA020D": {
+    nameHe: "ניהול בטיחות – חובה",
+    nameEn: "Safety Management (Mandatory)",
+    descHe: `שירות חובה – מוגדר בהסכם SOW תחת סעיף 3 "Account Level Platform Services".
+
+שירות זה הינו שירות פלטפורמה ברמת חשבון (Account Level) המחייב כל אתרי IBM.
+הגדרה מפורטת מופיעה בהסכם SOW של IBM – יש לפנות למנהל החשבון לפרטים נוספים.`
+  },
+  "SLA021A": {
+    nameHe: "רווח",
+    nameEn: "Profit",
+    descHe: `מרכיב הרווח לספק (Apleona):
+
+• הרווח הינו סכום שנתי המשולם ע"י IBM לApleona החל מ-1 באפריל 2026
+• IBM משלם את הרווח מדי חודש במטבע מקומי
+• הסכום החודשי מחושב על ידי הכפלת אחוז מוסכם בעלות השירותים הנשלטים ובלתי נשלטים (ללא עלויות ניהול חשבון)
+• האחוז המדויק מוגדר בהסכם SOW`
+  },
+  "SLA022A": {
+    nameHe: "עלויות ניהול חשבון (חובה)",
+    nameEn: "Account Management Costs",
+    descHe: `עלויות ניהול חשבון של Apleona:
+
+• כולל: עלויות ניהול ותמיכה בשירות, עלויות מערכות IT של Apleona, עלויות תקורה כללית
+• תקורה כוללת:
+  – ניהול בכיר וניהול חשבון
+  – מנהלים אזוריים
+  – שירותי תמיכה מרכזיים (משאבי אנוש, כספים, רכש, IT)
+• עלויות אלו הינן עלויות קבועות עבור כלל שירותי הניהול לחוזה IBM`
+  }
+};
+
+// Keyword search data for Q&A
+const QA_KB = [
+  {kw:["זמן תגובה","תגובה","תקלה","SLA תגובה"],
+   ans:"לפי חוזה IBM, זמני התגובה נקבעים לפי דרגת הדחיפות (Priority) של התקלה. תקלות קריטיות: תגובה מיידית ותיקון מהיר ככל האפשר. תקלות רגילות: לפי לוח זמנים מוסכם. לכל SLA יש מדדי ביצוע (KPI) המפורטים בהסכם SOW. לפרטים מדויקים לגבי אתר ספציפי, פנה למנהל החשבון של Apleona."},
+  {kw:["תשלום","חיוב","חשבונית","תשלום חודשי"],
+   ans:"לפי חוזה IBM, IBM משלם לApleona מדי חודש במטבע מקומי. חשבוניות מוגשות ומשולמות לפי לוחות הזמנים המוגדרים בהסכם SOW. עלויות תחזוקה, רווח ועלויות ניהול מחושבות בנפרד."},
+  {kw:["תאריך","תחילה","תוקף","חוזה","תקופה","מתי"],
+   ans:"חוזה IBM נכנס לתוקף ב-1 באפריל 2026 (Effective Date). תקופת ההסכם מוגדרת בכל Statement of Work בנפרד. לפי MSA, ניתן להאריך לתקופה נוספת עד 12 חודשים לאחר הודעת סיום של 60 יום."},
+  {kw:["סיום","ביטול","סיום חוזה","הפסקה"],
+   ans:"לפי חוזה IBM: IBM רשאי לסיים את הסכם SOW בהודעה של 60 יום מראש. בתקופת 'Exit Services' (עד 12 חודשים) Apleona ממשיכה לתת שירות עד העברה מסודרת. הפסקה מוקדמת כרוכה בפיצוי כפי שמוגדר בהסכם MSA."},
+  {kw:["אחריות","אחריות ספק","IBM","חובות"],
+   ans:"לפי חוזה IBM: Apleona (הספק) אחראי על מתן כל שירותי FM המפורטים ב-SLA. IBM (הלקוח) אחראי על גישה, מתקנים, ציוד מוגדר בחוזה, ותשלומים. במקרה של מחלוקת, יש לפנות לנציג IBM GRE."},
+  {kw:["ניקיון","ניקוי","housekeeping","שירות ניקיון"],
+   ans:"שירות הניקיון (SLA009A) מכסה ניקיון סטנדרטי לפי לוח תדירויות מוסכם. כולל: משרדים, מסדרונות, שירותים, מטבחים, חדרי כנסים ושטחים משותפים. ניתן לבדוק אם שירות זה כלול באתר שלך ע\"י בחירת האתר ברשימה."},
+  {kw:["בטיחות","בטיחות עובד","בריאות","H&S","safety"],
+   ans:"שירות ניהול בריאות ובטיחות (SLA018A) כולל: ניהול לוחות הנחיות חירום, תמיכה בפינויים, ניהול אסבסט, היתרי עבודה (עבודה בגובה, עבודות חמות, כניסה לחללים סגורים) ועמידה בחקיקה. ניתן לבדוק אם השירות כלול באתרך."},
+  {kw:["כלול","כלול בחוזה","מה כלול","איזה שירות"],
+   ans:"ניתן לבדוק אילו שירותים כלולים בכל אתר על ידי בחירת האתר בתפריט הנפתח בראש האפליקציה. שירותים מסומנים בירוק = כלולים בחוזה IBM. שירותים מסומנים באדום = לא כלולים ודורשים אישור נפרד."},
+  {kw:["CMMS","מערכת ניהול","מחשוב","maximo","tririga"],
+   ans:"כל פעילויות התחזוקה, דיווחים ורישומים מנוהלים דרך מערכת CMMS של IBM (Maximo). עדכונים, בקשות שירות ומעקב תקלות מתבצעים דרך מערכת זו. IBM גם משתמש ב-TRIRIGA לניהול מרחב ו-RESObase לנתוני נכסים."},
+  {kw:["קפיטריה","מזנון","אוכל","מזון","cafeteria"],
+   ans:"שירותי קפיטריה מכוסים ב-SLA008A (תחזוקת ציוד קפיטריה) ו-SLA019F (ממשק קפיטריה). SLA008A מכסה תחזוקת ציוד; SLA019F מכסה את הממשק עם ספק המזון. ניתן לבדוק אם שירותים אלו כלולים באתרך."},
+  {kw:["אנרגיה","חשמל","חשבון חשמל","utility","gas","גז","מים","water"],
+   ans:"ניהול חשבונות שירותים (SLA012D) כולל קריאת מדים, אימות חשבוניות ועיבוד תשלומים. ניהול אנרגיה (SLA012B) כולל ניטור ייעול אנרגיה. שמירת מים (SLA017E) כולל מעקב צריכת מים."},
+  {kw:["אסבסט","asbestos"],
+   ans:"ניהול אסבסט מכוסה כחלק מ-SLA018A (ניהול בריאות ובטיחות). כולל: תוכנית בקרת אסבסט, תיעוד מלאי, בדיקות תקופתיות, פיקוח על עבודות הסרה. עמידה מלאה בחקיקה הישראלית הרלוונטית."},
+  {kw:["עבודה בגובה","גובה","high work","height"],
+   ans:"עבודה בגובה מחייבת היתר עבודה מיוחד כחלק מ-SLA018A. Apleona אחראי על ניהול תוכנית היתרי עבודה כולל: עבודה בגובה, עבודות חמות, כניסה לחללים סגורים ו-LOTO."},
+  {kw:["גנרטור","generator","UPS","חירום","אל פסק"],
+   ans:"תחזוקת גנרטורים (SLA004D) ו-UPS (SLA004E) כוללים בדיקות שוטפות, הרצות תחת עומס, תחזוקה מניעתית ועמידה בתקנות. ניתן לבדוק אם שירותים אלו כלולים באתרך."},
+  {kw:["הדברה","pest","מזיקים","חרקים"],
+   ans:"שירות ההדברה (SLA007B) כולל פיתוח ויישום תוכנית הדברה מקיפה לפנים ולחוץ, כולל קפיטריה. שימוש בחומרים מאושרים ע\"י IBM בלבד. תיאום עם ספק הקפיטריה לכיסוי מלא."},
+  {kw:["אוורור","HVAC","מיזוג","ventilation","קירור"],
+   ans:"תחזוקת מערכות אוורור (SLA003A), קירור (SLA003B) ומיזוג מנוהלים על ידי Apleona. כולל תחזוקה מניעתית, ניטור שוטף, יעילות אנרגטית ומענה לתלונות. ניתן לבדוק אם השירותים כלולים באתרך."}
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let adminMode = false;
+let currentSite = null;
+let currentSlaCode = null;
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function renderSite() {
+  const site = document.getElementById('siteSelect').value;
+  currentSite = site;
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const list = document.getElementById('slaList');
+
+  if (!site) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🏢</div><p>בחר אתר כדי להציג את רשימת ה-SLA</p></div>';
+    document.getElementById('statsBar').style.display = 'none';
+    document.getElementById('searchWrap').style.display = 'none';
+    return;
+  }
+
+  const slas = SITES_DATA[site] || [];
+  document.getElementById('statsBar').style.display = 'flex';
+  document.getElementById('searchWrap').style.display = 'block';
+
+  let filtered = slas;
+  if (query) {
+    filtered = slas.filter(s => {
+      const info = SLA_INFO[s.code] || {};
+      return s.code.toLowerCase().includes(query) ||
+        (info.nameHe||'').toLowerCase().includes(query) ||
+        (info.nameEn||'').toLowerCase().includes(query) ||
+        (info.descHe||'').toLowerCase().includes(query);
+    });
+  }
+
+  const inc = slas.filter(s=>s.included).length;
+  const exc = slas.filter(s=>!s.included).length;
+  document.getElementById('statIncluded').textContent = inc;
+  document.getElementById('statExcluded').textContent = exc;
+  document.getElementById('statTotal').textContent = slas.length;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>לא נמצאו SLA התואמים לחיפוש</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(s => {
+    const info = SLA_INFO[s.code] || {nameHe: s.code, nameEn: ''};
+    const cls = s.included ? 'included' : 'excluded';
+    const badgeText = s.included ? 'כלול בחוזה ✓' : 'לא כלול ✗';
+    const excludedMsg = !s.included ? `<div class="excluded-msg">⚠️ שירות זה אינו כלול בחוזה IBM ודורש אישור נפרד</div>` : '';
+    const priceTag = adminMode && s.included ? `<div class="sla-price-tag">💰 ${formatPrice(s.price)} ₪ / שנה</div>` : '';
+    return `
+      <div class="sla-card ${cls}" onclick="openModal('${s.code}')">
+        <div class="sla-card-body">
+          <div class="sla-code">${s.code}</div>
+          <div class="sla-name">${info.nameHe}</div>
+          <div class="sla-name-en">${info.nameEn}</div>
+          ${excludedMsg}${priceTag}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span class="badge ${cls}">${badgeText}</span>
+          <span class="more-icon">›</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function formatPrice(p) {
+  return p.toLocaleString('he-IL', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+// ═══════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════
+function openModal(code) {
+  const site = document.getElementById('siteSelect').value;
+  const slas = SITES_DATA[site] || [];
+  const slaData = slas.find(s => s.code === code);
+  const info = SLA_INFO[code] || {nameHe: code, nameEn: '', descHe: 'אין תיאור זמין.'};
+
+  document.getElementById('modalCode').textContent = code;
+  document.getElementById('modalTitle').textContent = info.nameHe;
+  document.getElementById('modalTitleEn').textContent = info.nameEn;
+
+  const statusBar = document.getElementById('modalStatusBar');
+  if (slaData && slaData.included) {
+    statusBar.className = 'modal-status-bar included';
+    statusBar.textContent = '✅ שירות זה כלול בחוזה IBM';
+  } else {
+    statusBar.className = 'modal-status-bar excluded';
+    statusBar.textContent = '⚠️ שירות זה אינו כלול בחוזה IBM ודורש אישור נפרד';
+  }
+
+  document.getElementById('modalDesc').textContent = info.descHe;
+
+  const priceDiv = document.getElementById('modalPriceSection');
+  const priceDivider = document.getElementById('modalPriceDivider');
+  if (adminMode && slaData && slaData.included) {
+    priceDiv.style.display = 'block';
+    priceDivider.style.display = 'block';
+    document.getElementById('modalPriceValue').textContent = `${formatPrice(slaData.price)} ₪ לשנה`;
+  } else {
+    priceDiv.style.display = 'none';
+    priceDivider.style.display = 'none';
+  }
+
+  document.getElementById('detailModal').classList.add('active');
+  currentSlaCode = code;
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════
+//  Q&A
+// ═══════════════════════════════════════════
+function answerQuestion() {
+  const q = document.getElementById('qaInput').value.trim().toLowerCase();
+  const resEl = document.getElementById('qaResult');
+  if (!q) return;
+
+  // Search knowledge base
+  let best = null;
+  let bestScore = 0;
+  for (const item of QA_KB) {
+    let score = 0;
+    for (const kw of item.kw) {
+      if (q.includes(kw.toLowerCase())) score += 2;
+      else {
+        const words = kw.toLowerCase().split(' ');
+        for (const w of words) {
+          if (q.includes(w) && w.length > 2) score += 1;
+        }
+      }
+    }
+    if (score > bestScore) { bestScore = score; best = item; }
+  }
+
+  // Also search SLA descriptions
+  if (bestScore < 2) {
+    const tokens = q.split(/\s+/).filter(t=>t.length>2);
+    let bestSla = null;
+    let bestSlaScore = 0;
+    for (const [code, info] of Object.entries(SLA_INFO)) {
+      let s = 0;
+      const haystack = (info.nameHe + ' ' + info.nameEn + ' ' + info.descHe).toLowerCase();
+      for (const t of tokens) { if (haystack.includes(t)) s++; }
+      if (s > bestSlaScore) { bestSlaScore = s; bestSla = {code, info}; }
+    }
+    if (bestSlaScore >= 1 && bestSla) {
+      resEl.className = 'qa-result found';
+      resEl.style.display = 'block';
+      resEl.innerHTML = `<strong>📋 נמצא מידע רלוונטי – ${bestSla.info.nameHe} (${bestSla.code}):</strong><br><br>${bestSla.info.descHe.replace(/\n/g,'<br>')}`;
+      return;
+    }
+  }
+
+  resEl.style.display = 'block';
+  if (bestScore >= 2 && best) {
+    resEl.className = 'qa-result found';
+    resEl.innerHTML = `<strong>📄 על פי חוזה IBM:</strong><br><br>${best.ans}`;
+  } else {
+    resEl.className = 'qa-result notfound';
+    resEl.innerHTML = `<strong>ℹ️ מידע זה אינו מופיע בחוזה.</strong><br>פנה למנהל האחראי.`;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════
+function onAdminBtnClick() {
+  if (adminMode) {
+    adminMode = false;
+    document.getElementById('adminToggleBtn').classList.remove('active');
+    document.getElementById('adminToggleBtn').textContent = 'מנהל';
+    renderSite();
+  } else {
+    document.getElementById('adminCodeInput').value = '';
+    document.getElementById('adminErr').textContent = '';
+    document.getElementById('adminModal').classList.add('active');
+    setTimeout(() => document.getElementById('adminCodeInput').focus(), 100);
+  }
+}
+
+function submitAdminCode() {
+  const code = document.getElementById('adminCodeInput').value.trim();
+  if (code === '644995') {
+    adminMode = true;
+    document.getElementById('adminModal').classList.remove('active');
+    document.getElementById('adminToggleBtn').classList.add('active');
+    document.getElementById('adminToggleBtn').textContent = 'מנהל ✓';
+    renderSite();
+  } else {
+    document.getElementById('adminErr').textContent = '⛔ קוד שגוי';
+    document.getElementById('adminCodeInput').value = '';
+    setTimeout(() => {
+      document.getElementById('adminModal').classList.remove('active');
+      document.getElementById('adminErr').textContent = '';
+    }, 1500);
+  }
+}
+
+function closeAdminModal() {
+  document.getElementById('adminModal').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.getElementById('slaList').innerHTML = '<div class="empty-state"><div class="icon">🏢</div><p>בחר אתר כדי להציג את רשימת ה-SLA</p></div>';
+</script>
+</body>
+</html>
